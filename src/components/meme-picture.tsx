@@ -1,5 +1,6 @@
-import { Box, Text, useDimensions } from "@chakra-ui/react";
-import { useMemo, useRef } from "react";
+import { Box, Text, useDimensions } from '@chakra-ui/react';
+import { useMemo, useRef } from 'react';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
 
 export type MemePictureProps = {
   pictureUrl: string;
@@ -15,11 +16,7 @@ const REF_WIDTH = 800;
 const REF_HEIGHT = 450;
 const REF_FONT_SIZE = 36;
 
-export const MemePicture: React.FC<MemePictureProps> = ({
-  pictureUrl,
-  texts: rawTexts,
-  dataTestId = '',
-}) => {
+export const MemePicture: React.FC<MemePictureProps> = ({ pictureUrl, texts: rawTexts, dataTestId = '' }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const dimensions = useDimensions(containerRef, true);
   const boxWidth = dimensions?.borderBox.width;
@@ -32,7 +29,7 @@ export const MemePicture: React.FC<MemePictureProps> = ({
     return {
       height: (boxWidth / REF_WIDTH) * REF_HEIGHT,
       fontSize: (boxWidth / REF_WIDTH) * REF_FONT_SIZE,
-      texts: rawTexts.map((text) => ({
+      texts: rawTexts.map(text => ({
         ...text,
         x: (boxWidth / REF_WIDTH) * text.x,
         y: (boxWidth / REF_WIDTH) * text.y,
@@ -45,7 +42,6 @@ export const MemePicture: React.FC<MemePictureProps> = ({
       width="full"
       height={height}
       ref={containerRef}
-      backgroundImage={pictureUrl}
       backgroundColor="gray.100"
       backgroundPosition="center"
       backgroundRepeat="no-repeat"
@@ -54,7 +50,10 @@ export const MemePicture: React.FC<MemePictureProps> = ({
       position="relative"
       borderRadius={8}
       data-testid={dataTestId}
+      style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
     >
+      <LazyLoadImage src={pictureUrl} style={{ height: '100%' }} />
+
       {texts.map((text, index) => (
         <Text
           key={index}
@@ -67,7 +66,7 @@ export const MemePicture: React.FC<MemePictureProps> = ({
           fontWeight="bold"
           userSelect="none"
           textTransform="uppercase"
-          style={{ WebkitTextStroke: "1px black" }}
+          style={{ WebkitTextStroke: '1px black' }}
           data-testid={`${dataTestId}-text-${index}`}
         >
           {text.content}
