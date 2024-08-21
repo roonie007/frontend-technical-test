@@ -49,10 +49,9 @@ export const MemePicture: React.FC<MemePictureProps> = ({ pictureUrl, texts: raw
       overflow="hidden"
       position="relative"
       borderRadius={8}
-      data-testid={dataTestId}
       style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
     >
-      <LazyLoadImage src={pictureUrl} style={{ height: '100%' }} />
+      <LazyLoadImage src={pictureUrl} style={{ height: '100%' }} data-testid={dataTestId} />
 
       {texts.map((text, index) => (
         <Text
