@@ -23,49 +23,50 @@ function checkStatus(response: Response) {
 }
 
 export type LoginResponse = {
-  jwt: string
-}
+  jwt: string;
+};
 
 /**
  * Authenticate the user with the given credentials
- * @param username 
- * @param password 
- * @returns 
+ * @param username
+ * @param password
+ * @returns
  */
 export async function login(username: string, password: string): Promise<LoginResponse> {
   return await fetch(`${BASE_URL}/authentication/login`, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     },
     body: JSON.stringify({ username, password }),
-  }).then(res => checkStatus(res).json())
+  }).then(res => checkStatus(res).json());
 }
 
 export type GetUserByIdResponse = {
   id: string;
   username: string;
   pictureUrl: string;
-}
+};
 
 /**
  * Get a user by their id
- * @param token 
- * @param id 
- * @returns 
+ * @param token
+ * @param id
+ * @returns
  */
 export async function getUserById(token: string, id: string): Promise<GetUserByIdResponse> {
   return await fetch(`${BASE_URL}/users/${id}`, {
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    }
-  }).then(res => checkStatus(res).json())
+      Authorization: `Bearer ${token}`,
+    },
+  }).then(res => checkStatus(res).json());
 }
 
 export type GetMemesResponse = {
   total: number;
   pageSize: number;
+  nextPage?: number;
   results: {
     id: string;
     authorId: string;
@@ -78,35 +79,41 @@ export type GetMemesResponse = {
       y: number;
     }[];
     createdAt: string;
-  }[]
-}
+  }[];
+};
 
 /**
  * Get the list of memes for a given page
- * @param token 
- * @param page 
- * @returns 
+ * @param token
+ * @param page
+ * @returns
  */
 export async function getMemes(token: string, page: number): Promise<GetMemesResponse> {
-  return await fetch(`${BASE_URL}/memes?page=${page}`, {
+  const data = await fetch(`${BASE_URL}/memes?page=${page}`, {
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    }
-  }).then(res => checkStatus(res).json())
+      Authorization: `Bearer ${token}`,
+    },
+  }).then(res => checkStatus(res).json());
+
+  return {
+    ...data,
+    nextPage: data.results.length > 0 ? page + 1 : undefined,
+  };
 }
 
 export type GetMemeCommentsResponse = {
   total: number;
   pageSize: number;
+  nextPage?: number;
   results: {
     id: string;
     authorId: string;
     memeId: string;
     content: string;
     createdAt: string;
-  }[]
-}
+  }[];
+};
 
 /**
  * Get comments for a meme
@@ -115,12 +122,17 @@ export type GetMemeCommentsResponse = {
  * @returns
  */
 export async function getMemeComments(token: string, memeId: string, page: number): Promise<GetMemeCommentsResponse> {
-  return await fetch(`${BASE_URL}/memes/${memeId}/comments?page=${page}`, {
+  const data = await fetch(`${BASE_URL}/memes/${memeId}/comments?page=${page}`, {
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    }
-  }).then(res => checkStatus(res).json())
+      Authorization: `Bearer ${token}`,
+    },
+  }).then(res => checkStatus(res).json());
+
+  return {
+    ...data,
+    nextPage: data.results.length > 0 ? page + 1 : undefined,
+  };
 }
 
 export type CreateCommentResponse = {
@@ -129,7 +141,7 @@ export type CreateCommentResponse = {
   createdAt: string;
   authorId: string;
   memeId: string;
-}
+};
 
 /**
  * Create a comment for a meme
@@ -137,12 +149,16 @@ export type CreateCommentResponse = {
  * @param memeId
  * @param content
  */
-export async function createMemeComment(token: string, memeId: string, content: string): Promise<CreateCommentResponse> {
+export async function createMemeComment(
+  token: string,
+  memeId: string,
+  content: string,
+): Promise<CreateCommentResponse> {
   return await fetch(`${BASE_URL}/memes/${memeId}/comments`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
+      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({ content }),
   }).then(res => checkStatus(res).json());
