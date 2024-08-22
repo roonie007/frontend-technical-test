@@ -25,9 +25,8 @@ const apiHandler = async <T>(urlOrPath: string, options?: RequestInit): Promise<
   const response = await fetch(url, {
     ...options,
     headers: {
-      ...options?.headers,
-      'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
+      ...(options?.body instanceof FormData ? {} : { 'Content-Type': 'application/json' }),
     },
   });
 
@@ -111,10 +110,7 @@ export const createMemeComment = async (memeId: string, content: string) =>
  * @returns
  */
 export const createMeme = async (formData: FormData) =>
-  fetch(`/memes`, {
+  apiHandler(`/memes`, {
     method: 'POST',
-    headers: {
-      Authorization: `Bearer ${localToken.load()}`,
-    },
     body: formData,
   });
