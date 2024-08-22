@@ -170,3 +170,18 @@ export async function createMemeComment(
     body: JSON.stringify({ content }),
   }).then(res => checkStatus(res).json());
 }
+
+/**
+ * Create a meme
+ * @param formData
+ */
+
+export function createMeme(formData: FormData) {
+  return fetch(`${BASE_URL}/memes`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${localToken.load()}`,
+    },
+    body: formData,
+  }).then(res => checkStatus(res));
+}
