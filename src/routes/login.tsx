@@ -2,8 +2,9 @@ import { Flex, FormControl, FormLabel, Heading, Text, Input, Button, FormErrorMe
 import { useMutation } from '@tanstack/react-query';
 import { createFileRoute, Navigate } from '@tanstack/react-router';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { login, UnauthorizedError } from '../api';
+import { login } from '../api';
 import { useAuthentication } from '../contexts/authentication';
+import { FError } from '../helpers/error';
 
 type SearchParams = {
   redirect?: string;
@@ -15,7 +16,7 @@ type Inputs = {
 };
 
 function renderError(error: Error) {
-  if (error instanceof UnauthorizedError) {
+  if (error instanceof FError && error.code === 401) {
     return <FormErrorMessage>Wrong credentials</FormErrorMessage>;
   }
   return <FormErrorMessage>An unknown error occured, please try again later</FormErrorMessage>;

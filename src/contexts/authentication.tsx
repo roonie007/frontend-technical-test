@@ -1,6 +1,7 @@
 import { jwtDecode } from 'jwt-decode';
 import { createContext, PropsWithChildren, useCallback, useContext, useMemo, useState } from 'react';
 import localToken from '../helpers/localToken';
+import { FError } from '../helpers/error';
 
 export type AuthenticationState =
   | {
@@ -55,7 +56,7 @@ export const AuthenticationProvider: React.FC<PropsWithChildren> = ({ children }
 export function useAuthentication() {
   const context = useContext(AuthenticationContext);
   if (!context) {
-    throw new Error('useAuthentication must be used within an AuthenticationProvider');
+    throw new FError('useAuthentication must be used within an AuthenticationProvider');
   }
   return context;
 }
@@ -63,7 +64,7 @@ export function useAuthentication() {
 export function useAuthToken() {
   const { state } = useAuthentication();
   if (!state.isAuthenticated) {
-    throw new Error('User is not authenticated');
+    throw new FError('User is not authenticated');
   }
   return state.token;
 }

@@ -7,6 +7,7 @@ import type {
   GetUserByIdResponse,
   LoginResponse,
 } from './types/apiResponse';
+import { FError } from './helpers/error';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL as string;
 
@@ -32,7 +33,7 @@ const apiHandler = async <T>(urlOrPath: string, options?: RequestInit): Promise<
 
   if (response.status === 401) {
     if (response.url.includes('authentication/login')) {
-      throw new Error('Unauthorized');
+      throw new FError('Unauthorized', 401);
     }
 
     localToken.remove();
@@ -40,7 +41,7 @@ const apiHandler = async <T>(urlOrPath: string, options?: RequestInit): Promise<
   }
 
   if (response.status === 404) {
-    throw new Error('Not Found');
+    throw new FError('Not Found', 404);
   }
 
   return response.json();
