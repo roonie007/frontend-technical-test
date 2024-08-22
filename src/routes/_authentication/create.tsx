@@ -7,16 +7,12 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 import { createMeme } from '../../api';
 import { MemeEditor } from '../../components/meme-editor';
 
+import type { Picture } from '../../types/common';
 import type { MemePictureProps } from '../../types/props';
 
 export const Route = createFileRoute('/_authentication/create')({
   component: CreateMemePage,
 });
-
-type Picture = {
-  file: File;
-  url: string;
-};
 
 function CreateMemePage() {
   const [picture, setPicture] = useState<null | Picture>(null);

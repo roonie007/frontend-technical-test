@@ -9,7 +9,7 @@ import type {
   GetMemesResponse,
   GetUserByIdResponse,
   LoginResponse,
-} from './types/apiResponse';
+} from './types/apiData';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL as string;
 

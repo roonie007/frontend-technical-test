@@ -8,16 +8,8 @@ import { login } from '../api';
 import { useAuthentication } from '../contexts/authentication';
 import { FError } from '../helpers/error';
 
+import type { Inputs, SearchParams } from '../types/common';
 import type { SubmitHandler } from 'react-hook-form';
-
-type SearchParams = {
-  redirect?: string;
-};
-
-type Inputs = {
-  password: string;
-  username: string;
-};
 
 function renderError(error: Error) {
   if (error instanceof FError && error.code === 401) {

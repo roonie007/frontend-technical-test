@@ -1,5 +1,5 @@
 import type { APIMeme, APIMemeComment, APIUser } from './apiData';
-import type { ListResponse } from './apiResponse';
+import type { ListResponse } from './apiData';
 
 export interface ClientMemeData extends APIMeme {
   author: APIUser;

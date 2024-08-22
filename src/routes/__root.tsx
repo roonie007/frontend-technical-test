@@ -5,11 +5,7 @@ import { createRootRouteWithContext, Link, Outlet } from '@tanstack/react-router
 import { UserDropdown } from '../components/user-dropdown';
 import { useAuthentication } from '../contexts/authentication';
 
-import type { AuthenticationState } from '../contexts/authentication';
-
-type RouterContext = {
-  authState: AuthenticationState;
-};
+import type { RouterContext } from '../types/common';
 
 export const Route = createRootRouteWithContext<RouterContext>()({
   component: () => {
