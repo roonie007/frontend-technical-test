@@ -1,23 +1,14 @@
 import urlJoin from 'url-join';
 import localToken from './helpers/localToken';
+import type {
+  CreateCommentResponse,
+  GetMemeCommentsResponse,
+  GetMemesResponse,
+  GetUserByIdResponse,
+  LoginResponse,
+} from './types/apiResponse';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL as string;
-
-export class UnauthorizedError extends Error {
-  constructor() {
-    super('Unauthorized');
-  }
-}
-
-export class NotFoundError extends Error {
-  constructor() {
-    super('Not Found');
-  }
-}
-
-export type LoginResponse = {
-  jwt: string;
-};
 
 /**
  * Generic fetch handler that adds the Authorization header with the token
@@ -41,7 +32,7 @@ const apiHandler = async <T>(urlOrPath: string, options?: RequestInit): Promise<
 
   if (response.status === 401) {
     if (response.url.includes('authentication/login')) {
-      throw new UnauthorizedError();
+      throw new Error('Unauthorized');
     }
 
     localToken.remove();
@@ -49,7 +40,7 @@ const apiHandler = async <T>(urlOrPath: string, options?: RequestInit): Promise<
   }
 
   if (response.status === 404) {
-    throw new NotFoundError();
+    throw new Error('Not Found');
   }
 
   return response.json();
@@ -64,37 +55,12 @@ const apiHandler = async <T>(urlOrPath: string, options?: RequestInit): Promise<
 export const login = (username: string, password: string) =>
   apiHandler<LoginResponse>('/authentication/login', { method: 'POST', body: JSON.stringify({ username, password }) });
 
-export type GetUserByIdResponse = {
-  id: string;
-  username: string;
-  pictureUrl: string;
-};
-
 /**
  * Get a user by their id
  * @param id
  * @returns
  */
 export const getUserById = (id: string) => apiHandler<GetUserByIdResponse>(`/users/${id}`);
-
-export type GetMemesResponse = {
-  total: number;
-  pageSize: number;
-  nextPage?: number;
-  results: {
-    id: string;
-    authorId: string;
-    pictureUrl: string;
-    description: string;
-    commentsCount: string;
-    texts: {
-      content: string;
-      x: number;
-      y: number;
-    }[];
-    createdAt: string;
-  }[];
-};
 
 /**
  * Get the list of memes for a given page
@@ -109,19 +75,6 @@ export const getMemes = async (page: number) => {
     ...data,
     nextPage: data.results.length > 0 ? page + 1 : undefined,
   };
-};
-
-export type GetMemeCommentsResponse = {
-  total: number;
-  pageSize: number;
-  nextPage?: number;
-  results: {
-    id: string;
-    authorId: string;
-    memeId: string;
-    content: string;
-    createdAt: string;
-  }[];
 };
 
 /**
@@ -139,14 +92,6 @@ export const getMemeComments = async (memeId: string, page: number) => {
   };
 };
 
-export type CreateCommentResponse = {
-  id: string;
-  content: string;
-  createdAt: string;
-  authorId: string;
-  memeId: string;
-};
-
 /**
  * Create a comment for a meme
  * @param memeId
@@ -160,10 +105,10 @@ export const createMemeComment = async (memeId: string, content: string) =>
   });
 
 /**
- * Create a meme
+ *
  * @param formData
+ * @returns
  */
-
 export const createMeme = async (formData: FormData) =>
   fetch(`/memes`, {
     method: 'POST',

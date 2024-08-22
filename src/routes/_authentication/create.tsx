@@ -2,9 +2,9 @@ import { Box, Button, Flex, Heading, HStack, Icon, IconButton, Input, Textarea, 
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { MemeEditor } from '../../components/meme-editor';
 import { useMemo, useState } from 'react';
-import { MemePictureProps } from '../../components/meme-picture';
 import { Plus, Trash } from '@phosphor-icons/react';
 import { createMeme } from '../../api';
+import { MemePictureProps } from '../../types/props';
 
 export const Route = createFileRoute('/_authentication/create')({
   component: CreateMemePage,

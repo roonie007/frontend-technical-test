@@ -1,14 +1,8 @@
 import { useDropzone } from 'react-dropzone';
-import { MemePicture, MemePictureProps } from './meme-picture';
+import { MemePicture } from './meme-picture';
 import { AspectRatio, Box, Button, Flex, Icon, Text } from '@chakra-ui/react';
 import { Image, Pencil } from '@phosphor-icons/react';
-
-export type MemeEditorProps = {
-  onDrop: (file: File) => void;
-  memePicture?: MemePictureProps;
-  editMode?: boolean;
-  updateTexts?: (texts: MemePictureProps['texts']) => void;
-};
+import { MemeEditorProps, MemePictureProps } from '../types/props';
 
 function renderNoPicture() {
   return (

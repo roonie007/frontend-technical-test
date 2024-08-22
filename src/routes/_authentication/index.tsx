@@ -8,14 +8,8 @@ import { useAuthToken } from '../../contexts/authentication';
 import { Loader } from '../../components/loader';
 import { jwtDecode } from 'jwt-decode';
 import React from 'react';
-import { Meme, MemeProps } from '../../components/meme';
-
-type MemeFeedData = {
-  results: MemeProps['meme'][];
-  total: number;
-  pageSize: number;
-  nextPage?: number;
-};
+import { Meme } from '../../components/meme';
+import { ClientMemeDataList } from '../../types/clientData';
 
 export const MemeFeedPage: React.FC = () => {
   const token = useAuthToken();
@@ -27,7 +21,7 @@ export const MemeFeedPage: React.FC = () => {
     fetchNextPage,
     data: memes,
     refetch,
-  } = useInfiniteQuery<MemeFeedData, Error>({
+  } = useInfiniteQuery<ClientMemeDataList, Error>({
     queryKey: ['memes'],
     initialPageParam: 1,
     getNextPageParam: lastPage => {
@@ -67,9 +61,7 @@ export const MemeFeedPage: React.FC = () => {
 
   const { data: user } = useQuery({
     queryKey: ['user'],
-    queryFn: async () => {
-      return await getUserById(jwtDecode<{ id: string }>(token).id);
-    },
+    queryFn: () => getUserById(jwtDecode<{ id: string }>(token).id),
   });
 
   if (isLoading) {

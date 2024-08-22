@@ -15,29 +15,13 @@ import {
 import { CaretDown, CaretUp, Chat } from '@phosphor-icons/react';
 import { format } from 'timeago.js';
 import { MemePicture } from './meme-picture';
-import { createMemeComment, getMemeComments, GetMemesResponse, getUserById, GetUserByIdResponse } from '../api';
+import { createMemeComment, getMemeComments, getUserById } from '../api';
 import { useState } from 'react';
 import { useInfiniteQuery, useMutation } from '@tanstack/react-query';
-import { MemeComment, MemeCommentData } from './meme-comment';
+import { MemeComment } from './meme-comment';
 import React from 'react';
-
-export type MemeData = GetMemesResponse['results']['0'] & {
-  author: GetUserByIdResponse;
-  comments: MemeCommentData[];
-};
-
-export type MemeProps = {
-  meme: MemeData;
-  user?: GetUserByIdResponse;
-  onNewComment?: () => void;
-};
-
-type MemeCommentResponseData = {
-  results: MemeCommentData[];
-  total: number;
-  pageSize: number;
-  nextPage?: number;
-};
+import { ClientMemeCommentDataList } from '../types/clientData';
+import { MemeProps } from '../types/props';
 
 export const Meme: React.FC<MemeProps> = ({ meme, user, onNewComment }) => {
   const [showCommentSection, setShowCommentSection] = useState(false);
@@ -50,7 +34,7 @@ export const Meme: React.FC<MemeProps> = ({ meme, user, onNewComment }) => {
     fetchNextPage,
     data: comments,
     refetch,
-  } = useInfiniteQuery<MemeCommentResponseData>({
+  } = useInfiniteQuery<ClientMemeCommentDataList>({
     queryKey: ['comments', meme.id],
     enabled: () => showCommentSection,
     initialPageParam: 1,

@@ -2,18 +2,7 @@ import { Box, Text, useDimensions } from '@chakra-ui/react';
 import { useMemo, useRef, useState } from 'react';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import Draggable from 'react-draggable';
-
-export type MemePictureProps = {
-  pictureUrl: string;
-  texts: {
-    content: string;
-    x: number;
-    y: number;
-  }[];
-  dataTestId?: string;
-  editMode?: boolean;
-  updateTexts?: (texts: MemePictureProps['texts']) => void;
-};
+import { MemePictureProps } from '../types/props';
 
 const REF_WIDTH = 800;
 const REF_HEIGHT = 450;

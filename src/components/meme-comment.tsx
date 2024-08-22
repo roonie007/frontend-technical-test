@@ -1,16 +1,6 @@
 import { Avatar, Flex, Box, Text } from '@chakra-ui/react';
-import { GetMemeCommentsResponse, GetUserByIdResponse } from '../api';
 import { format } from 'timeago.js';
-import { MemeData } from './meme';
-
-export type MemeCommentData = GetMemeCommentsResponse['results']['0'] & {
-  author: GetUserByIdResponse;
-};
-
-export type MemeCommentProps = {
-  meme: MemeData;
-  comment: MemeCommentData;
-};
+import { MemeCommentProps } from '../types/props';
 
 export const MemeComment: React.FC<MemeCommentProps> = ({ meme, comment }) => {
   return (
