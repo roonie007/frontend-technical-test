@@ -10,7 +10,7 @@ export const UserDropdown: React.FC = () => {
     queryKey: ['user', state.isAuthenticated ? state.userId : 'anon'],
     queryFn: () => {
       if (state.isAuthenticated) {
-        return getUserById(state.token, state.userId);
+        return getUserById(state.userId);
       }
       return null;
     },
