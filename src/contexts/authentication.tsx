@@ -1,12 +1,6 @@
-import { jwtDecode } from "jwt-decode";
-import {
-  createContext,
-  PropsWithChildren,
-  useCallback,
-  useContext,
-  useMemo,
-  useState,
-} from "react";
+import { jwtDecode } from 'jwt-decode';
+import { createContext, PropsWithChildren, useCallback, useContext, useMemo, useState } from 'react';
+import localToken from '../helpers/localToken';
 
 export type AuthenticationState =
   | {
@@ -24,50 +18,44 @@ export type Authentication = {
   signout: () => void;
 };
 
-export const AuthenticationContext = createContext<Authentication | undefined>(
-  undefined,
-);
+export const AuthenticationContext = createContext<Authentication | undefined>(undefined);
 
-export const AuthenticationProvider: React.FC<PropsWithChildren> = ({
-  children,
-}) => {
+export const AuthenticationProvider: React.FC<PropsWithChildren> = ({ children }) => {
+  const localStoredToken = localToken.load();
+
   const [state, setState] = useState<AuthenticationState>({
-    isAuthenticated: false,
+    isAuthenticated: localStoredToken != null,
+    token: localStoredToken ?? '',
+    userId: localStoredToken ? jwtDecode<{ id: string }>(localStoredToken).id : '',
   });
 
   const authenticate = useCallback(
     (token: string) => {
       setState({
         isAuthenticated: true,
-        token,
+        token: token,
         userId: jwtDecode<{ id: string }>(token).id,
       });
+
+      localToken.save(token);
     },
     [setState],
   );
 
   const signout = useCallback(() => {
     setState({ isAuthenticated: false });
+    localToken.remove();
   }, [setState]);
 
-  const contextValue = useMemo(
-    () => ({ state, authenticate, signout }),
-    [state, authenticate, signout],
-  );
+  const contextValue = useMemo(() => ({ state, authenticate, signout }), [state, authenticate, signout]);
 
-  return (
-    <AuthenticationContext.Provider value={contextValue}>
-      {children}
-    </AuthenticationContext.Provider>
-  );
+  return <AuthenticationContext.Provider value={contextValue}>{children}</AuthenticationContext.Provider>;
 };
 
 export function useAuthentication() {
   const context = useContext(AuthenticationContext);
   if (!context) {
-    throw new Error(
-      "useAuthentication must be used within an AuthenticationProvider",
-    );
+    throw new Error('useAuthentication must be used within an AuthenticationProvider');
   }
   return context;
 }
@@ -75,7 +63,7 @@ export function useAuthentication() {
 export function useAuthToken() {
   const { state } = useAuthentication();
   if (!state.isAuthenticated) {
-    throw new Error("User is not authenticated");
+    throw new Error('User is not authenticated');
   }
   return state.token;
 }
