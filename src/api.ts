@@ -1,3 +1,5 @@
+import localToken from './helpers/localToken';
+
 const BASE_URL = import.meta.env.VITE_API_BASE_URL as string;
 
 export class UnauthorizedError extends Error {
@@ -14,7 +16,8 @@ export class NotFoundError extends Error {
 
 function checkStatus(response: Response) {
   if (response.status === 401) {
-    throw new UnauthorizedError();
+    localToken.remove();
+    document.location.reload();
   }
   if (response.status === 404) {
     throw new NotFoundError();
