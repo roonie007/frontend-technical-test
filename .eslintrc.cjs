@@ -13,6 +13,7 @@ module.exports = {
   rules: {
     'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
     '@typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/consistent-type-imports': 'error',
     'react-hooks/rules-of-hooks': 'warn',
 
     // ESLint Imports
