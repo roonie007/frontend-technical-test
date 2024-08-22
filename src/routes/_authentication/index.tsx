@@ -4,7 +4,7 @@ import { Flex, StackDivider, VStack } from '@chakra-ui/react';
 
 import useInfiniteScroll from 'react-infinite-scroll-hook';
 import { getMemes, getUserById } from '../../api';
-import { useAuthToken } from '../../contexts/authentication';
+import { useAuthToken, useUserId } from '../../contexts/authentication';
 import { Loader } from '../../components/loader';
 import { jwtDecode } from 'jwt-decode';
 import React from 'react';
@@ -12,7 +12,7 @@ import { Meme } from '../../components/meme';
 import { ClientMemeDataList } from '../../types/clientData';
 
 export const MemeFeedPage: React.FC = () => {
-  const token = useAuthToken();
+  const userId = useUserId();
 
   const {
     isLoading,
@@ -61,7 +61,7 @@ export const MemeFeedPage: React.FC = () => {
 
   const { data: user } = useQuery({
     queryKey: ['user'],
-    queryFn: () => getUserById(jwtDecode<{ id: string }>(token).id),
+    queryFn: () => getUserById(userId),
   });
 
   if (isLoading) {
