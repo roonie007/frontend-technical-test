@@ -13,7 +13,7 @@ const remove = () => {
 };
 
 export default {
-  save,
   load,
   remove,
+  save,
 };

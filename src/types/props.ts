@@ -1,28 +1,28 @@
-import { APIMeme, APIUser } from './apiData';
-import { ClientMemeCommentData, ClientMemeData } from './clientData';
+import type { APIMeme, APIUser } from './apiData';
+import type { ClientMemeCommentData, ClientMemeData } from './clientData';
 
 export interface MemeProps {
   meme: ClientMemeData;
-  user?: APIUser;
   onNewComment?: () => void;
+  user?: APIUser;
 }
 
 export interface MemePictureProps {
-  pictureUrl: string;
-  texts: APIMeme['texts'];
   dataTestId?: string;
   editMode?: boolean;
+  pictureUrl: string;
+  texts: APIMeme['texts'];
   updateTexts?: (texts: APIMeme['texts']) => void;
 }
 
 export interface MemeEditorProps {
-  onDrop: (file: File) => void;
-  memePicture?: MemePictureProps;
   editMode?: boolean;
+  memePicture?: MemePictureProps;
+  onDrop: (file: File) => void;
   updateTexts?: (texts: APIMeme['texts']) => void;
 }
 
 export interface MemeCommentProps {
-  meme: ClientMemeData;
   comment: ClientMemeCommentData;
+  meme: ClientMemeData;
 }

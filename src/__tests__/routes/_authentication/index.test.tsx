@@ -1,11 +1,12 @@
-import 'react-intersection-observer/test-utils';
-
-import { screen, waitFor, fireEvent, act } from '@testing-library/react';
 import { ChakraProvider } from '@chakra-ui/react';
-import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { act, fireEvent, screen, waitFor } from '@testing-library/react';
+
 import { AuthenticationContext } from '../../../contexts/authentication';
 import { MemeFeedPage } from '../../../routes/_authentication/index';
 import { renderWithRouter } from '../../utils';
+
+import 'react-intersection-observer/test-utils';
 
 // We mock the LazyLoadImage component to avoid rendering the actual image
 vi.mock('react-lazy-load-image-component', () => ({
@@ -22,13 +23,13 @@ describe('routes/_authentication/index', () => {
             <QueryClientProvider client={new QueryClient()}>
               <AuthenticationContext.Provider
                 value={{
-                  state: {
-                    isAuthenticated: true,
-                    userId: 'dummy_user_id',
-                    token: 'dummy_token',
-                  },
                   authenticate: () => {},
                   signout: () => {},
+                  state: {
+                    isAuthenticated: true,
+                    token: 'dummy_token',
+                    userId: 'dummy_user_id',
+                  },
                 }}
               >
                 {children}
@@ -54,13 +55,13 @@ describe('routes/_authentication/index', () => {
         const text2 = screen.getByTestId('meme-picture-dummy_meme_id_1-text-1');
         expect(text1).toHaveTextContent('dummy text 1');
         expect(text1).toHaveStyle({
-          top: '0px',
           left: '0px',
+          top: '0px',
         });
         expect(text2).toHaveTextContent('dummy text 2');
         expect(text2).toHaveStyle({
-          top: '100px',
           left: '100px',
+          top: '100px',
         });
 
         // We check that the right description is displayed

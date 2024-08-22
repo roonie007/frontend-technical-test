@@ -4,10 +4,10 @@ export const theme = extendTheme({
   styles: {
     global: {
       'html, body, #root': {
-        width: 'full',
         height: 'full',
         margin: 0,
         padding: 0,
+        width: 'full',
       },
     },
   },

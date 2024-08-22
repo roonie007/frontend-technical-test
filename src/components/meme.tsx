@@ -1,46 +1,48 @@
+import { useState } from 'react';
+import React from 'react';
+
 import {
   Avatar,
   Box,
+  Button,
   Collapse,
+  Divider,
   Flex,
   Icon,
+  Input,
   LinkBox,
   LinkOverlay,
   Text,
-  Input,
   VStack,
-  Divider,
-  Button,
 } from '@chakra-ui/react';
 import { CaretDown, CaretUp, Chat } from '@phosphor-icons/react';
-import { format } from 'timeago.js';
-import { MemePicture } from './meme-picture';
-import { createMemeComment, getMemeComments, getUserById } from '../api';
-import { useState } from 'react';
 import { useInfiniteQuery, useMutation } from '@tanstack/react-query';
-import { MemeComment } from './meme-comment';
-import React from 'react';
-import { ClientMemeCommentDataList } from '../types/clientData';
-import { MemeProps } from '../types/props';
+import { format } from 'timeago.js';
 
-export const Meme: React.FC<MemeProps> = ({ meme, user, onNewComment }) => {
+import { createMemeComment, getMemeComments, getUserById } from '../api';
+import { MemeComment } from './meme-comment';
+import { MemePicture } from './meme-picture';
+
+import type { ClientMemeCommentDataList } from '../types/clientData';
+import type { MemeProps } from '../types/props';
+
+export const Meme: React.FC<MemeProps> = ({ meme, onNewComment, user }) => {
   const [showCommentSection, setShowCommentSection] = useState(false);
   const [commentContent, setCommentContent] = useState<string>('');
 
   const {
-    isLoading,
-    isFetching,
-    hasNextPage,
-    fetchNextPage,
     data: comments,
+    fetchNextPage,
+    hasNextPage,
+    isFetching,
+    isLoading,
     refetch,
   } = useInfiniteQuery<ClientMemeCommentDataList>({
-    queryKey: ['comments', meme.id],
     enabled: () => showCommentSection,
-    initialPageParam: 1,
     getNextPageParam: lastPage => {
       return lastPage.nextPage;
     },
+    initialPageParam: 1,
     queryFn: async ({ pageParam }) => {
       const commentsPageData = await getMemeComments(meme.id, pageParam as number);
 
@@ -54,12 +56,13 @@ export const Meme: React.FC<MemeProps> = ({ meme, user, onNewComment }) => {
       });
 
       return {
-        pageSize: commentsPageData.pageSize,
-        total: commentsPageData.total,
         nextPage: commentsPageData.nextPage,
+        pageSize: commentsPageData.pageSize,
         results: await Promise.all(commentsPromises),
+        total: commentsPageData.total,
       };
     },
+    queryKey: ['comments', meme.id],
   });
 
   const { mutate } = useMutation({
@@ -76,41 +79,41 @@ export const Meme: React.FC<MemeProps> = ({ meme, user, onNewComment }) => {
   });
 
   return (
-    <VStack key={meme.id} p={4} width="full" align="stretch">
-      <Flex justifyContent="space-between" alignItems="center">
+    <VStack align="stretch" key={meme.id} p={4} width="full">
+      <Flex alignItems="center" justifyContent="space-between">
         <Flex>
           <Avatar
-            borderWidth="1px"
             borderColor="gray.300"
-            size="xs"
+            borderWidth="1px"
             name={meme.author.username}
+            size="xs"
             src={meme.author.pictureUrl}
           />
-          <Text ml={2} data-testid={`meme-author-${meme.id}`}>
+          <Text data-testid={`meme-author-${meme.id}`} ml={2}>
             {meme.author.username}
           </Text>
         </Flex>
-        <Text fontStyle="italic" color="gray.500" fontSize="small">
+        <Text color="gray.500" fontSize="small" fontStyle="italic">
           {format(meme.createdAt)}
         </Text>
       </Flex>
-      <MemePicture pictureUrl={meme.pictureUrl} texts={meme.texts} dataTestId={`meme-picture-${meme.id}`} />
+      <MemePicture dataTestId={`meme-picture-${meme.id}`} pictureUrl={meme.pictureUrl} texts={meme.texts} />
       <Box>
-        <Text fontWeight="bold" fontSize="medium" mb={2}>
+        <Text fontSize="medium" fontWeight="bold" mb={2}>
           Description:{' '}
         </Text>
-        <Box p={2} borderRadius={8} border="1px solid" borderColor="gray.100">
-          <Text color="gray.500" whiteSpace="pre-line" data-testid={`meme-description-${meme.id}`}>
+        <Box border="1px solid" borderColor="gray.100" borderRadius={8} p={2}>
+          <Text color="gray.500" data-testid={`meme-description-${meme.id}`} whiteSpace="pre-line">
             {meme.description}
           </Text>
         </Box>
       </Box>
-      <LinkBox as={Box} py={2} borderBottom="1px solid black">
-        <Flex justifyContent="space-between" alignItems="center">
+      <LinkBox as={Box} borderBottom="1px solid black" py={2}>
+        <Flex alignItems="center" justifyContent="space-between">
           <Flex alignItems="center">
             <LinkOverlay
-              data-testid={`meme-comments-section-${meme.id}`}
               cursor="pointer"
+              data-testid={`meme-comments-section-${meme.id}`}
               onClick={() => setShowCommentSection(true)}
             >
               <Text data-testid={`meme-comments-count-${meme.id}`}>{meme.commentsCount} comments</Text>
@@ -120,7 +123,7 @@ export const Meme: React.FC<MemeProps> = ({ meme, user, onNewComment }) => {
           <Icon as={Chat} />
         </Flex>
       </LinkBox>
-      <Collapse in={showCommentSection} animateOpacity>
+      <Collapse animateOpacity in={showCommentSection}>
         <Box mb={6}>
           <form
             data-testid={`meme-comment-form-${meme.id}`}
@@ -135,20 +138,20 @@ export const Meme: React.FC<MemeProps> = ({ meme, user, onNewComment }) => {
           >
             <Flex alignItems="center">
               <Avatar
-                borderWidth="1px"
                 borderColor="gray.300"
-                name={user?.username}
-                src={user?.pictureUrl}
-                size="sm"
+                borderWidth="1px"
                 mr={2}
+                name={user?.username}
+                size="sm"
+                src={user?.pictureUrl}
               />
               <Input
-                placeholder="Type your comment here..."
+                data-testid={`meme-comment-input-${meme.id}`}
                 onChange={event => {
                   setCommentContent(event.target.value);
                 }}
+                placeholder="Type your comment here..."
                 value={commentContent}
-                data-testid={`meme-comment-input-${meme.id}`}
               />
             </Flex>
           </form>
@@ -157,13 +160,13 @@ export const Meme: React.FC<MemeProps> = ({ meme, user, onNewComment }) => {
           {comments?.pages.map((page, pageIndex) => (
             <React.Fragment key={pageIndex}>
               {page.results.map(comment => (
-                <MemeComment key={comment.id} meme={meme} comment={comment} />
+                <MemeComment comment={comment} key={comment.id} meme={meme} />
               ))}
             </React.Fragment>
           ))}
 
           {hasNextPage && (
-            <Button variant="link" onClick={() => fetchNextPage()} isLoading={isLoading || isFetching}>
+            <Button isLoading={isLoading || isFetching} onClick={() => fetchNextPage()} variant="link">
               Load more comments
             </Button>
           )}

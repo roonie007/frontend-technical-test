@@ -1,14 +1,14 @@
-import { APIMeme, APIMemeComment, APIUser } from './apiData';
+import type { APIMeme, APIMemeComment, APIUser } from './apiData';
 
 export interface LoginResponse {
   jwt: string;
 }
 
 export interface ListResponse<T> {
-  total: number;
-  pageSize: number;
   nextPage?: number;
+  pageSize: number;
   results: Array<T>;
+  total: number;
 }
 
 // Define the alias types for the API responses

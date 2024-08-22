@@ -1,5 +1,8 @@
 import urlJoin from 'url-join';
+
+import { FError } from './helpers/error';
 import localToken from './helpers/localToken';
+
 import type {
   CreateCommentResponse,
   GetMemeCommentsResponse,
@@ -7,7 +10,6 @@ import type {
   GetUserByIdResponse,
   LoginResponse,
 } from './types/apiResponse';
-import { FError } from './helpers/error';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL as string;
 
@@ -53,7 +55,7 @@ const apiHandler = async <T>(urlOrPath: string, options?: RequestInit): Promise<
  * @returns
  */
 export const login = (username: string, password: string) =>
-  apiHandler<LoginResponse>('/authentication/login', { method: 'POST', body: JSON.stringify({ username, password }) });
+  apiHandler<LoginResponse>('/authentication/login', { body: JSON.stringify({ password, username }), method: 'POST' });
 
 /**
  * Get a user by their id
@@ -100,8 +102,8 @@ export const getMemeComments = async (memeId: string, page: number) => {
 
 export const createMemeComment = async (memeId: string, content: string) =>
   apiHandler<CreateCommentResponse>(`/memes/${memeId}/comments`, {
-    method: 'POST',
     body: JSON.stringify({ content }),
+    method: 'POST',
   });
 
 /**
@@ -111,6 +113,6 @@ export const createMemeComment = async (memeId: string, content: string) =>
  */
 export const createMeme = async (formData: FormData) =>
   apiHandler(`/memes`, {
-    method: 'POST',
     body: formData,
+    method: 'POST',
   });

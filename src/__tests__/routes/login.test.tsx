@@ -1,17 +1,20 @@
-import { vi } from 'vitest';
-import { act, fireEvent, waitFor, screen } from '@testing-library/react';
-import { renderWithRouter } from '../utils';
-import { LoginPage } from '../../routes/login';
-import { AuthenticationContext, AuthenticationState } from '../../contexts/authentication';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ChakraProvider } from '@chakra-ui/react';
-import { ListenerFn, RouterEvents } from '@tanstack/react-router';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { act, fireEvent, screen, waitFor } from '@testing-library/react';
+import { vi } from 'vitest';
+
+import { AuthenticationContext } from '../../contexts/authentication';
+import { LoginPage } from '../../routes/login';
+import { renderWithRouter } from '../utils';
+
+import type { AuthenticationState } from '../../contexts/authentication';
+import type { ListenerFn, RouterEvents } from '@tanstack/react-router';
 
 type RenderLoginPageParams = {
   authenticate?: (token: string) => void;
   authState?: AuthenticationState;
-  onNavigate?: ListenerFn<RouterEvents['onBeforeNavigate']>;
   currentPath?: string;
+  onNavigate?: ListenerFn<RouterEvents['onBeforeNavigate']>;
 };
 
 describe('routes/login', () => {
@@ -19,21 +22,21 @@ describe('routes/login', () => {
     function renderLoginPage({
       authenticate = () => {},
       authState = { isAuthenticated: false },
-      onNavigate = () => {},
       currentPath = '/login',
+      onNavigate = () => {},
     }: RenderLoginPageParams = {}) {
       return renderWithRouter({
-        onNavigate,
-        currentUrl: currentPath,
         component: LoginPage,
+        currentUrl: currentPath,
+        onNavigate,
         Wrapper: ({ children }) => (
           <ChakraProvider>
             <QueryClientProvider client={new QueryClient()}>
               <AuthenticationContext.Provider
                 value={{
-                  state: authState,
                   authenticate,
                   signout: () => {},
+                  state: authState,
                 }}
               >
                 {children}
@@ -127,8 +130,8 @@ describe('routes/login', () => {
           token: 'dummy_token',
           userId: 'dummy_user_id',
         },
-        onNavigate: onBeforeNavigateMock,
         currentPath: '/login?redirect=/profile',
+        onNavigate: onBeforeNavigateMock,
       });
 
       await waitFor(() => {

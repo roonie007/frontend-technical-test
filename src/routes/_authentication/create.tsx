@@ -1,29 +1,32 @@
-import { Box, Button, Flex, Heading, HStack, Icon, IconButton, Input, Textarea, VStack } from '@chakra-ui/react';
-import { createFileRoute, Link } from '@tanstack/react-router';
-import { MemeEditor } from '../../components/meme-editor';
 import { useMemo, useState } from 'react';
+
+import { Box, Button, Flex, Heading, HStack, Icon, IconButton, Input, Textarea, VStack } from '@chakra-ui/react';
 import { Plus, Trash } from '@phosphor-icons/react';
+import { createFileRoute, Link } from '@tanstack/react-router';
+
 import { createMeme } from '../../api';
-import { MemePictureProps } from '../../types/props';
+import { MemeEditor } from '../../components/meme-editor';
+
+import type { MemePictureProps } from '../../types/props';
 
 export const Route = createFileRoute('/_authentication/create')({
   component: CreateMemePage,
 });
 
 type Picture = {
-  url: string;
   file: File;
+  url: string;
 };
 
 function CreateMemePage() {
-  const [picture, setPicture] = useState<Picture | null>(null);
+  const [picture, setPicture] = useState<null | Picture>(null);
   const [description, setDescription] = useState<string>('');
   const [texts, setTexts] = useState<MemePictureProps['texts']>([]);
 
   const handleDrop = (file: File) => {
     setPicture({
-      url: URL.createObjectURL(file),
       file,
+      url: URL.createObjectURL(file),
     });
   };
 
@@ -67,82 +70,82 @@ function CreateMemePage() {
     }
 
     return {
+      editMode: true,
       pictureUrl: picture.url,
       texts,
-      editMode: true,
       updateTexts: setTexts,
     };
   }, [picture, texts]);
 
   return (
-    <Flex width="full" height="full">
-      <Box flexGrow={1} height="full" p={4} overflowY="auto">
-        <VStack spacing={5} align="stretch">
+    <Flex height="full" width="full">
+      <Box flexGrow={1} height="full" overflowY="auto" p={4}>
+        <VStack align="stretch" spacing={5}>
           <Box>
-            <Heading as="h2" size="md" mb={2}>
+            <Heading as="h2" mb={2} size="md">
               Upload your picture
             </Heading>
-            <MemeEditor onDrop={handleDrop} memePicture={memePicture} />
+            <MemeEditor memePicture={memePicture} onDrop={handleDrop} />
           </Box>
           <Box>
-            <Heading as="h2" size="md" mb={2}>
+            <Heading as="h2" mb={2} size="md">
               Describe your meme
             </Heading>
             <Textarea
+              onChange={e => setDescription(e.target.value)}
               placeholder="Type your description here..."
               value={description}
-              onChange={e => setDescription(e.target.value)}
             />
           </Box>
         </VStack>
       </Box>
-      <Flex flexDir="column" width="30%" minW="250" height="full" boxShadow="lg">
-        <Heading as="h2" size="md" mb={2} p={4}>
+      <Flex boxShadow="lg" flexDir="column" height="full" minW="250" width="30%">
+        <Heading as="h2" mb={2} p={4} size="md">
           Add your captions
         </Heading>
-        <Box p={4} flexGrow={1} height={0} overflowY="auto">
+        <Box flexGrow={1} height={0} overflowY="auto" p={4}>
           <VStack>
             {texts.map((text, index) => (
               <Flex width="full">
                 <Input
                   key={index}
-                  value={text.content}
                   mr={1}
                   onChange={e => {
                     setTexts(texts.map((t, i) => (i === index ? { ...t, content: e.target.value } : t)));
                   }}
+                  value={text.content}
                 />
                 <IconButton
-                  onClick={() => handleDeleteCaptionButtonClick(index)}
                   aria-label="Delete caption"
                   icon={<Icon as={Trash} />}
+                  onClick={() => handleDeleteCaptionButtonClick(index)}
                 />
               </Flex>
             ))}
             <Button
               colorScheme="cyan"
-              leftIcon={<Icon as={Plus} />}
-              variant="ghost"
-              size="sm"
-              width="full"
-              onClick={handleAddCaptionButtonClick}
               isDisabled={memePicture === undefined}
+              leftIcon={<Icon as={Plus} />}
+              onClick={handleAddCaptionButtonClick}
+              size="sm"
+              variant="ghost"
+              width="full"
             >
               Add a caption
             </Button>
           </VStack>
         </Box>
         <HStack p={4}>
-          <Button as={Link} to="/" colorScheme="cyan" variant="outline" size="sm" width="full">
+          <Button as={Link} colorScheme="cyan" size="sm" to="/" variant="outline" width="full">
             Cancel
           </Button>
           <Button
-            colorScheme="cyan"
-            size="sm"
-            width="full"
             color="white"
+            colorScheme="cyan"
             isDisabled={memePicture === undefined}
             onClick={handleSubmit}
+            size="sm"
+            width="full"
           >
             Submit
           </Button>
