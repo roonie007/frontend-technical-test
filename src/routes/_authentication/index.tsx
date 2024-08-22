@@ -26,11 +26,11 @@ export const MemeFeedPage: React.FC = () => {
     hasNextPage,
     fetchNextPage,
     data: memes,
+    refetch,
   } = useInfiniteQuery<MemeFeedData, Error>({
     queryKey: ['memes'],
     initialPageParam: 1,
     getNextPageParam: lastPage => {
-      console.log(lastPage);
       return lastPage.nextPage;
     },
     queryFn: async ({ pageParam }) => {
@@ -81,7 +81,7 @@ export const MemeFeedPage: React.FC = () => {
         {memes?.pages.map((page, pageIndex) => (
           <React.Fragment key={pageIndex}>
             {page.results.map(meme => (
-              <Meme key={meme.id} meme={meme} token={token} user={user} />
+              <Meme key={meme.id} meme={meme} token={token} user={user} onNewComment={refetch} />
             ))}
           </React.Fragment>
         ))}

@@ -30,6 +30,7 @@ export type MemeProps = {
   meme: MemeData;
   user?: GetUserByIdResponse;
   token: string;
+  onNewComment?: () => void;
 };
 
 type MemeCommentResponseData = {
@@ -39,16 +40,9 @@ type MemeCommentResponseData = {
   nextPage?: number;
 };
 
-export const Meme: React.FC<MemeProps> = ({ meme, token, user }) => {
+export const Meme: React.FC<MemeProps> = ({ meme, token, user, onNewComment }) => {
   const [showCommentSection, setShowCommentSection] = useState(false);
-  const [commentContent, setCommentContent] = useState<{
-    [key: string]: string;
-  }>({});
-  const { mutate } = useMutation({
-    mutationFn: async (data: { memeId: string; content: string }) => {
-      await createMemeComment(token, data.memeId, data.content);
-    },
-  });
+  const [commentContent, setCommentContent] = useState<string>('');
 
   const {
     isLoading,
@@ -56,12 +50,12 @@ export const Meme: React.FC<MemeProps> = ({ meme, token, user }) => {
     hasNextPage,
     fetchNextPage,
     data: comments,
+    refetch,
   } = useInfiniteQuery<MemeCommentResponseData>({
     queryKey: ['comments', meme.id],
     enabled: () => showCommentSection,
     initialPageParam: 1,
     getNextPageParam: lastPage => {
-      console.log(lastPage);
       return lastPage.nextPage;
     },
     queryFn: async ({ pageParam }) => {
@@ -82,6 +76,19 @@ export const Meme: React.FC<MemeProps> = ({ meme, token, user }) => {
         nextPage: commentsPageData.nextPage,
         results: await Promise.all(commentsPromises),
       };
+    },
+  });
+
+  const { mutate } = useMutation({
+    mutationFn: async (data: string) => {
+      await createMemeComment(token, meme.id, data);
+
+      if (onNewComment) {
+        await onNewComment();
+      }
+
+      setCommentContent('');
+      await refetch();
     },
   });
 
@@ -133,14 +140,14 @@ export const Meme: React.FC<MemeProps> = ({ meme, token, user }) => {
       <Collapse in={showCommentSection} animateOpacity>
         <Box mb={6}>
           <form
+            data-testid={`meme-comment-form-${meme.id}`}
             onSubmit={event => {
               event.preventDefault();
-              if (commentContent[meme.id]) {
-                mutate({
-                  memeId: meme.id,
-                  content: commentContent[meme.id],
-                });
+              if (commentContent.trim().length === 0) {
+                return;
               }
+
+              mutate(commentContent);
             }}
           >
             <Flex alignItems="center">
@@ -155,12 +162,10 @@ export const Meme: React.FC<MemeProps> = ({ meme, token, user }) => {
               <Input
                 placeholder="Type your comment here..."
                 onChange={event => {
-                  setCommentContent({
-                    ...commentContent,
-                    [meme.id]: event.target.value,
-                  });
+                  setCommentContent(event.target.value);
                 }}
-                value={commentContent[meme.id]}
+                value={commentContent}
+                data-testid={`meme-comment-input-${meme.id}`}
               />
             </Flex>
           </form>

@@ -154,7 +154,7 @@ export async function createMemeComment(
   memeId: string,
   content: string,
 ): Promise<CreateCommentResponse> {
-  return await fetch(`${BASE_URL}/memes/${memeId}/comments`, {
+  return fetch(`${BASE_URL}/memes/${memeId}/comments`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
