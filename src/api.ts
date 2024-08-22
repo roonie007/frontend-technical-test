@@ -16,6 +16,10 @@ export class NotFoundError extends Error {
 
 function checkStatus(response: Response) {
   if (response.status === 401) {
+    if (response.url.includes('authentication/login')) {
+      throw new UnauthorizedError();
+    }
+
     localToken.remove();
     document.location.reload();
   }
