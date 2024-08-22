@@ -47,7 +47,7 @@ export function renderWithRouter({
   router.subscribe('onBeforeNavigate', onNavigate);
   const renderResult = render(
     <Wrapper>
-      {/* @ts-expect-error */}
+      {/* @ts-expect-error EXPLICATION-NEEDED */}
       <RouterProvider router={router} />;
     </Wrapper>,
   );

@@ -1,7 +1,7 @@
 import { Box, Text, useDimensions } from '@chakra-ui/react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
-import Draggable, { DraggableData, DraggableEvent, DraggableEventHandler } from 'react-draggable';
+import Draggable from 'react-draggable';
 
 export type MemePictureProps = {
   pictureUrl: string;
@@ -60,7 +60,7 @@ export const MemePicture: React.FC<MemePictureProps> = ({
     };
   }
 
-  function handleDragStop(index: number, e: DraggableEvent, data: DraggableData) {
+  function handleDragStop(index: number) {
     if (!updateTexts) {
       return;
     }
@@ -93,7 +93,7 @@ export const MemePicture: React.FC<MemePictureProps> = ({
       <LazyLoadImage src={pictureUrl} style={{ height: '100%' }} data-testid={dataTestId} />
 
       {texts.map((text, index) => (
-        <Draggable key={index} onStop={(e, data) => handleDragStop(index, e, data)} disabled={!editMode}>
+        <Draggable key={index} onStop={() => handleDragStop(index)} disabled={!editMode}>
           <Text
             key={index}
             id={getElementId(index)}

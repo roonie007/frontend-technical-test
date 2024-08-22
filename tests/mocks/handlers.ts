@@ -1,4 +1,4 @@
-import { http, HttpResponse } from 'msw';
+import { http, HttpResponse, PathParams } from 'msw';
 
 const users = {
   dummy_user_id_1: {
@@ -58,7 +58,7 @@ const comments = [
 ];
 
 export const handlers = [
-  http.post<{}, { username: string; password: string }>(
+  http.post<PathParams<string>, { username: string; password: string }>(
     'https://fetestapi.int.mozzaik365.net/api/authentication/login',
     async ({ request }) => {
       const { username, password } = await request.json();
