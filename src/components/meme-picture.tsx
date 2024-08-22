@@ -1,6 +1,7 @@
 import { Box, Text, useDimensions } from '@chakra-ui/react';
-import { useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
+import Draggable, { DraggableData, DraggableEvent, DraggableEventHandler } from 'react-draggable';
 
 export type MemePictureProps = {
   pictureUrl: string;
@@ -10,16 +11,26 @@ export type MemePictureProps = {
     y: number;
   }[];
   dataTestId?: string;
+  editMode?: boolean;
+  updateTexts?: (texts: MemePictureProps['texts']) => void;
 };
 
 const REF_WIDTH = 800;
 const REF_HEIGHT = 450;
 const REF_FONT_SIZE = 36;
 
-export const MemePicture: React.FC<MemePictureProps> = ({ pictureUrl, texts: rawTexts, dataTestId = '' }) => {
+export const MemePicture: React.FC<MemePictureProps> = ({
+  pictureUrl,
+  texts: rawTexts,
+  dataTestId = '',
+  editMode,
+  updateTexts,
+}) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const dimensions = useDimensions(containerRef, true);
   const boxWidth = dimensions?.borderBox.width;
+
+  const [idPrefix] = useState(Math.random().toString(36).substring(7));
 
   const { height, fontSize, texts } = useMemo(() => {
     if (!boxWidth) {
@@ -36,6 +47,34 @@ export const MemePicture: React.FC<MemePictureProps> = ({ pictureUrl, texts: raw
       })),
     };
   }, [boxWidth, rawTexts]);
+
+  const getElementId = (index: number) => `${idPrefix}-text-${index}`;
+
+  function calculateElementPositionrelativeToContainer(element: HTMLElement) {
+    const containerRect = containerRef.current!.getBoundingClientRect();
+    const elementRect = element.getBoundingClientRect();
+
+    return {
+      x: elementRect.left - containerRect.left,
+      y: elementRect.top - containerRect.top,
+    };
+  }
+
+  function handleDragStop(index: number, e: DraggableEvent, data: DraggableData) {
+    if (!updateTexts) {
+      return;
+    }
+
+    const element = document.getElementById(getElementId(index));
+    if (!element) {
+      return;
+    }
+
+    const position = calculateElementPositionrelativeToContainer(element);
+    const newTexts = [...rawTexts];
+    newTexts[index] = { ...newTexts[index], x: position.x, y: position.y };
+    updateTexts(newTexts);
+  }
 
   return (
     <Box
@@ -54,22 +93,25 @@ export const MemePicture: React.FC<MemePictureProps> = ({ pictureUrl, texts: raw
       <LazyLoadImage src={pictureUrl} style={{ height: '100%' }} data-testid={dataTestId} />
 
       {texts.map((text, index) => (
-        <Text
-          key={index}
-          position="absolute"
-          left={text.x}
-          top={text.y}
-          fontSize={fontSize}
-          color="white"
-          fontFamily="Impact"
-          fontWeight="bold"
-          userSelect="none"
-          textTransform="uppercase"
-          style={{ WebkitTextStroke: '1px black' }}
-          data-testid={`${dataTestId}-text-${index}`}
-        >
-          {text.content}
-        </Text>
+        <Draggable key={index} onStop={(e, data) => handleDragStop(index, e, data)} disabled={!editMode}>
+          <Text
+            key={index}
+            id={getElementId(index)}
+            position="absolute"
+            left={text.x}
+            top={text.y}
+            fontSize={fontSize}
+            color="white"
+            fontFamily="Impact"
+            fontWeight="bold"
+            userSelect="none"
+            textTransform="uppercase"
+            style={{ WebkitTextStroke: '1px black' }}
+            data-testid={`${dataTestId}-text-${index}`}
+          >
+            {text.content}
+          </Text>
+        </Draggable>
       ))}
     </Box>
   );
