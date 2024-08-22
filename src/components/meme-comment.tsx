@@ -1,38 +1,29 @@
-import { Avatar, Flex, Box, Text } from '@chakra-ui/react';
-import { GetMemeCommentsResponse, GetUserByIdResponse } from '../api';
+import { Avatar, Box, Flex, Text } from '@chakra-ui/react';
 import { format } from 'timeago.js';
-import { MemeData } from './meme';
 
-export type MemeCommentData = GetMemeCommentsResponse['results']['0'] & {
-  author: GetUserByIdResponse;
-};
+import type { MemeCommentProps } from '../types/props';
 
-export type MemeCommentProps = {
-  meme: MemeData;
-  comment: MemeCommentData;
-};
-
-export const MemeComment: React.FC<MemeCommentProps> = ({ meme, comment }) => {
+export const MemeComment: React.FC<MemeCommentProps> = ({ comment, meme }) => {
   return (
     <Flex key={comment.id}>
       <Avatar
-        borderWidth="1px"
         borderColor="gray.300"
-        size="sm"
-        name={comment.author.username}
-        src={comment.author.pictureUrl}
+        borderWidth="1px"
         mr={2}
+        name={comment.author.username}
+        size="sm"
+        src={comment.author.pictureUrl}
       />
-      <Box p={2} borderRadius={8} bg="gray.50" flexGrow={1}>
-        <Flex justifyContent="space-between" alignItems="center">
+      <Box bg="gray.50" borderRadius={8} flexGrow={1} p={2}>
+        <Flex alignItems="center" justifyContent="space-between">
           <Flex>
             <Text data-testid={`meme-comment-author-${meme.id}-${comment.id}`}>{comment.author.username}</Text>
           </Flex>
-          <Text fontStyle="italic" color="gray.500" fontSize="small">
+          <Text color="gray.500" fontSize="small" fontStyle="italic">
             {format(comment.createdAt)}
           </Text>
         </Flex>
-        <Text color="gray.500" whiteSpace="pre-line" data-testid={`meme-comment-content-${meme.id}-${comment.id}`}>
+        <Text color="gray.500" data-testid={`meme-comment-content-${meme.id}-${comment.id}`} whiteSpace="pre-line">
           {comment.content}
         </Text>
       </Box>

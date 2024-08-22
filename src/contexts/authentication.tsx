@@ -1,21 +1,26 @@
+import { createContext, useCallback, useContext, useMemo, useState } from 'react';
+
 import { jwtDecode } from 'jwt-decode';
-import { createContext, PropsWithChildren, useCallback, useContext, useMemo, useState } from 'react';
+
+import { FError } from '../helpers/error';
 import localToken from '../helpers/localToken';
 
+import type { PropsWithChildren } from 'react';
+
 export type AuthenticationState =
+  | {
+      isAuthenticated: false;
+    }
   | {
       isAuthenticated: true;
       token: string;
       userId: string;
-    }
-  | {
-      isAuthenticated: false;
     };
 
 export type Authentication = {
-  state: AuthenticationState;
   authenticate: (token: string) => void;
   signout: () => void;
+  state: AuthenticationState;
 };
 
 export const AuthenticationContext = createContext<Authentication | undefined>(undefined);
@@ -47,7 +52,7 @@ export const AuthenticationProvider: React.FC<PropsWithChildren> = ({ children }
     localToken.remove();
   }, [setState]);
 
-  const contextValue = useMemo(() => ({ state, authenticate, signout }), [state, authenticate, signout]);
+  const contextValue = useMemo(() => ({ authenticate, signout, state }), [state, authenticate, signout]);
 
   return <AuthenticationContext.Provider value={contextValue}>{children}</AuthenticationContext.Provider>;
 };
@@ -55,7 +60,7 @@ export const AuthenticationProvider: React.FC<PropsWithChildren> = ({ children }
 export function useAuthentication() {
   const context = useContext(AuthenticationContext);
   if (!context) {
-    throw new Error('useAuthentication must be used within an AuthenticationProvider');
+    throw new FError('useAuthentication must be used within an AuthenticationProvider');
   }
   return context;
 }
@@ -63,7 +68,15 @@ export function useAuthentication() {
 export function useAuthToken() {
   const { state } = useAuthentication();
   if (!state.isAuthenticated) {
-    throw new Error('User is not authenticated');
+    throw new FError('User is not authenticated');
   }
   return state.token;
+}
+
+export function useUserId() {
+  const { state } = useAuthentication();
+  if (!state.isAuthenticated) {
+    throw new FError('User is not authenticated');
+  }
+  return state.userId;
 }

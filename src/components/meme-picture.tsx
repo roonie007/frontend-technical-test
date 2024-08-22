@@ -1,29 +1,20 @@
-import { Box, Text, useDimensions } from '@chakra-ui/react';
 import { useMemo, useRef, useState } from 'react';
-import { LazyLoadImage } from 'react-lazy-load-image-component';
 import Draggable from 'react-draggable';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
 
-export type MemePictureProps = {
-  pictureUrl: string;
-  texts: {
-    content: string;
-    x: number;
-    y: number;
-  }[];
-  dataTestId?: string;
-  editMode?: boolean;
-  updateTexts?: (texts: MemePictureProps['texts']) => void;
-};
+import { Box, Text, useDimensions } from '@chakra-ui/react';
+
+import type { MemePictureProps } from '../types/props';
 
 const REF_WIDTH = 800;
 const REF_HEIGHT = 450;
 const REF_FONT_SIZE = 36;
 
 export const MemePicture: React.FC<MemePictureProps> = ({
-  pictureUrl,
-  texts: rawTexts,
   dataTestId = '',
   editMode,
+  pictureUrl,
+  texts: rawTexts,
   updateTexts,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -32,14 +23,14 @@ export const MemePicture: React.FC<MemePictureProps> = ({
 
   const [idPrefix] = useState(Math.random().toString(36).substring(7));
 
-  const { height, fontSize, texts } = useMemo(() => {
+  const { fontSize, height, texts } = useMemo(() => {
     if (!boxWidth) {
-      return { height: 0, fontSize: 0, texts: rawTexts };
+      return { fontSize: 0, height: 0, texts: rawTexts };
     }
 
     return {
-      height: (boxWidth / REF_WIDTH) * REF_HEIGHT,
       fontSize: (boxWidth / REF_WIDTH) * REF_FONT_SIZE,
+      height: (boxWidth / REF_WIDTH) * REF_HEIGHT,
       texts: rawTexts.map(text => ({
         ...text,
         x: (boxWidth / REF_WIDTH) * text.x,
@@ -78,36 +69,36 @@ export const MemePicture: React.FC<MemePictureProps> = ({
 
   return (
     <Box
-      width="full"
-      height={height}
-      ref={containerRef}
       backgroundColor="gray.100"
       backgroundPosition="center"
       backgroundRepeat="no-repeat"
       backgroundSize="contain"
+      borderRadius={8}
+      height={height}
       overflow="hidden"
       position="relative"
-      borderRadius={8}
-      style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+      ref={containerRef}
+      style={{ alignItems: 'center', display: 'flex', justifyContent: 'center' }}
+      width="full"
     >
-      <LazyLoadImage src={pictureUrl} style={{ height: '100%' }} data-testid={dataTestId} />
+      <LazyLoadImage data-testid={dataTestId} src={pictureUrl} style={{ height: '100%' }} />
 
       {texts.map((text, index) => (
-        <Draggable key={index} onStop={() => handleDragStop(index)} disabled={!editMode}>
+        <Draggable disabled={!editMode} key={index} onStop={() => handleDragStop(index)}>
           <Text
-            key={index}
-            id={getElementId(index)}
-            position="absolute"
-            left={text.x}
-            top={text.y}
-            fontSize={fontSize}
             color="white"
-            fontFamily="Impact"
-            fontWeight="bold"
-            userSelect="none"
-            textTransform="uppercase"
-            style={{ WebkitTextStroke: '1px black' }}
             data-testid={`${dataTestId}-text-${index}`}
+            fontFamily="Impact"
+            fontSize={fontSize}
+            fontWeight="bold"
+            id={getElementId(index)}
+            key={index}
+            left={text.x}
+            position="absolute"
+            style={{ WebkitTextStroke: '1px black' }}
+            textTransform="uppercase"
+            top={text.y}
+            userSelect="none"
           >
             {text.content}
           </Text>

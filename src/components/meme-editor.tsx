@@ -1,19 +1,16 @@
 import { useDropzone } from 'react-dropzone';
-import { MemePicture, MemePictureProps } from './meme-picture';
+
 import { AspectRatio, Box, Button, Flex, Icon, Text } from '@chakra-ui/react';
 import { Image, Pencil } from '@phosphor-icons/react';
 
-export type MemeEditorProps = {
-  onDrop: (file: File) => void;
-  memePicture?: MemePictureProps;
-  editMode?: boolean;
-  updateTexts?: (texts: MemePictureProps['texts']) => void;
-};
+import { MemePicture } from './meme-picture';
+
+import type { MemeEditorProps, MemePictureProps } from '../types/props';
 
 function renderNoPicture() {
   return (
-    <Flex flexDir="column" width="full" height="full" alignItems="center" justifyContent="center">
-      <Icon as={Image} color="black" boxSize={16} />
+    <Flex alignItems="center" flexDir="column" height="full" justifyContent="center" width="full">
+      <Icon as={Image} boxSize={16} color="black" />
       <Text>Select a picture</Text>
       <Text color="gray.400" fontSize="sm">
         or drop it in this area
@@ -25,29 +22,29 @@ function renderNoPicture() {
 function renderMemePicture(memePicture: MemePictureProps, open: () => void) {
   return (
     <Box
-      width="full"
-      height="full"
-      position="relative"
       __css={{
-        '&:hover .change-picture-button': {
-          display: 'inline-block',
-        },
         '& .change-picture-button': {
           display: 'none',
         },
+        '&:hover .change-picture-button': {
+          display: 'inline-block',
+        },
       }}
+      height="full"
+      position="relative"
+      width="full"
     >
       <MemePicture {...memePicture} />
       <Button
         className="change-picture-button"
-        leftIcon={<Icon as={Pencil} boxSize={4} />}
-        colorScheme="cyan"
         color="white"
-        top="50%"
+        colorScheme="cyan"
         left="50%"
-        transform="translate(-50%, -50%)"
-        position="absolute"
+        leftIcon={<Icon as={Pencil} boxSize={4} />}
         onClick={open}
+        position="absolute"
+        top="50%"
+        transform="translate(-50%, -50%)"
       >
         Change picture
       </Button>
@@ -55,28 +52,28 @@ function renderMemePicture(memePicture: MemePictureProps, open: () => void) {
   );
 }
 
-export const MemeEditor: React.FC<MemeEditorProps> = ({ onDrop, memePicture }) => {
-  const { getRootProps, getInputProps, open } = useDropzone({
+export const MemeEditor: React.FC<MemeEditorProps> = ({ memePicture, onDrop }) => {
+  const { getInputProps, getRootProps, open } = useDropzone({
+    accept: { 'image/jpg': ['.jpg'], 'image/png': ['.png'] },
+    noClick: memePicture !== undefined,
     onDrop: (files: File[]) => {
       if (files.length === 0) {
         return;
       }
       onDrop(files[0]);
     },
-    noClick: memePicture !== undefined,
-    accept: { 'image/png': ['.png'], 'image/jpg': ['.jpg'] },
   });
 
   return (
     <AspectRatio ratio={16 / 9}>
       <Box
         {...getRootProps()}
-        width="full"
-        position="relative"
         border={!memePicture ? '1px dashed' : undefined}
         borderColor="gray.300"
         borderRadius={9}
+        position="relative"
         px={1}
+        width="full"
       >
         <input {...getInputProps()} />
         {memePicture ? renderMemePicture(memePicture, open) : renderNoPicture()}

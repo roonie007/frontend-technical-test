@@ -1,18 +1,19 @@
 import { StrictMode } from 'react';
-import ReactDOM from 'react-dom/client';
-import { RouterProvider, createRouter } from '@tanstack/react-router';
-import { ChakraProvider } from '@chakra-ui/react';
-import { theme } from './config/theme';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
+import { ChakraProvider } from '@chakra-ui/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { createRouter, RouterProvider } from '@tanstack/react-router';
+import ReactDOM from 'react-dom/client';
+
+import { theme } from './config/theme';
+import { AuthenticationProvider, useAuthentication } from './contexts/authentication';
 // Import the generated route tree
 import { routeTree } from './routeTree.gen';
-import { AuthenticationProvider, useAuthentication } from './contexts/authentication';
 
 // Create a new router instance
 const router = createRouter({
-  routeTree,
   context: { authState: { isAuthenticated: false } },
+  routeTree,
 });
 
 // Register the router instance for type safety
@@ -26,7 +27,7 @@ const queryClient = new QueryClient();
 
 function InnerApp() {
   const { state } = useAuthentication();
-  return <RouterProvider router={router} context={{ authState: state }} />;
+  return <RouterProvider context={{ authState: state }} router={router} />;
 }
 
 const rootElement = document.getElementById('root')!;
