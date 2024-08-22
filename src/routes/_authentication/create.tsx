@@ -69,6 +69,8 @@ function CreateMemePage() {
     return {
       pictureUrl: picture.url,
       texts,
+      editMode: true,
+      updateTexts: setTexts,
     };
   }, [picture, texts]);
 
