@@ -34,11 +34,11 @@ export const MemeFeedPage: React.FC = () => {
       return lastPage.nextPage;
     },
     queryFn: async ({ pageParam }) => {
-      const memesPageData = await getMemes(token, pageParam as number);
+      const memesPageData = await getMemes(pageParam as number);
 
       // Fetch the author for each meme
       const memesPromises = memesPageData.results.map(async meme => {
-        const author = await getUserById(token, meme.authorId);
+        const author = await getUserById(meme.authorId);
         return {
           ...meme,
           author,
@@ -68,7 +68,7 @@ export const MemeFeedPage: React.FC = () => {
   const { data: user } = useQuery({
     queryKey: ['user'],
     queryFn: async () => {
-      return await getUserById(token, jwtDecode<{ id: string }>(token).id);
+      return await getUserById(jwtDecode<{ id: string }>(token).id);
     },
   });
 
@@ -81,7 +81,7 @@ export const MemeFeedPage: React.FC = () => {
         {memes?.pages.map((page, pageIndex) => (
           <React.Fragment key={pageIndex}>
             {page.results.map(meme => (
-              <Meme key={meme.id} meme={meme} token={token} user={user} onNewComment={refetch} />
+              <Meme key={meme.id} meme={meme} user={user} onNewComment={refetch} />
             ))}
           </React.Fragment>
         ))}

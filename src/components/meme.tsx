@@ -29,7 +29,6 @@ export type MemeData = GetMemesResponse['results']['0'] & {
 export type MemeProps = {
   meme: MemeData;
   user?: GetUserByIdResponse;
-  token: string;
   onNewComment?: () => void;
 };
 
@@ -40,7 +39,7 @@ type MemeCommentResponseData = {
   nextPage?: number;
 };
 
-export const Meme: React.FC<MemeProps> = ({ meme, token, user, onNewComment }) => {
+export const Meme: React.FC<MemeProps> = ({ meme, user, onNewComment }) => {
   const [showCommentSection, setShowCommentSection] = useState(false);
   const [commentContent, setCommentContent] = useState<string>('');
 
@@ -59,11 +58,11 @@ export const Meme: React.FC<MemeProps> = ({ meme, token, user, onNewComment }) =
       return lastPage.nextPage;
     },
     queryFn: async ({ pageParam }) => {
-      const commentsPageData = await getMemeComments(token, meme.id, pageParam as number);
+      const commentsPageData = await getMemeComments(meme.id, pageParam as number);
 
       // Fetch the author for each meme comment
       const commentsPromises = commentsPageData.results.map(async comment => {
-        const author = await getUserById(token, comment.authorId);
+        const author = await getUserById(comment.authorId);
         return {
           ...comment,
           author,
@@ -81,7 +80,7 @@ export const Meme: React.FC<MemeProps> = ({ meme, token, user, onNewComment }) =
 
   const { mutate } = useMutation({
     mutationFn: async (data: string) => {
-      await createMemeComment(token, meme.id, data);
+      await createMemeComment(meme.id, data);
 
       if (onNewComment) {
         await onNewComment();
