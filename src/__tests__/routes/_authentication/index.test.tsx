@@ -1,6 +1,6 @@
 import 'react-intersection-observer/test-utils';
 
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, fireEvent, act } from '@testing-library/react';
 import { ChakraProvider } from '@chakra-ui/react';
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
 import { AuthenticationContext } from '../../../contexts/authentication';
@@ -94,6 +94,49 @@ describe('routes/_authentication/index', () => {
           'dummy_user_3',
         );
       });
+    });
+
+    it('should refetch the comments when a new comment is added', async () => {
+      renderMemeFeedPage();
+
+      // Wait for the memes to be displayed
+      await waitFor(() => {
+        expect(screen.getByTestId('meme-picture-dummy_meme_id_1')).toHaveAttribute('src', 'https://dummy.url/meme/1');
+      });
+
+      const commentSection = screen.getByTestId('meme-comments-section-dummy_meme_id_1');
+      const commentForm = screen.getByTestId('meme-comment-form-dummy_meme_id_1');
+      const commentInput = screen.getByTestId('meme-comment-input-dummy_meme_id_1');
+
+      act(() => {
+        // We click on the comments section
+        commentSection.click();
+
+        // We add a new comment
+        fireEvent.change(commentInput, {
+          target: { value: 'new test comment' },
+        });
+
+        fireEvent.submit(commentForm);
+      });
+
+      await waitFor(
+        () => {
+          // We check that the right number of comments is displayed
+          expect(screen.getByTestId('meme-comments-count-dummy_meme_id_1')).toHaveTextContent('4 comments');
+
+          // We check that the right comment with the right author is displayed
+          expect(screen.getByTestId('meme-comment-content-dummy_meme_id_1-dummy_comment_id_4')).toHaveTextContent(
+            'new test comment',
+          );
+          expect(screen.getByTestId('meme-comment-author-dummy_meme_id_1-dummy_comment_id_4')).toHaveTextContent(
+            'dummy_user_1',
+          );
+        },
+        {
+          timeout: 4000,
+        },
+      );
     });
   });
 });
